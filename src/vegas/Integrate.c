@@ -61,14 +61,14 @@ static int Integrate(This *t, real *integral, real *error, real *prob)
 
   StateSetup(t);
 
-  if( StateReadTest(t) ) {
-    StateReadOpen(t, fd) {
-      if( read(fd, state, statesize) != statesize ||
-          state->signature != StateSignature(t, 1) ) break;
-    } StateReadClose(t, fd);
-    t->neval = state->neval;
-    t->rng.skiprandom(t, t->neval);
-  }
+//   if( StateReadTest(t) ) {
+//     StateReadOpen(t, fd) {
+//       if( read(fd, state, statesize) != statesize ||
+//           state->signature != StateSignature(t, 1) ) break;
+//     } StateReadClose(t, fd);
+//     t->neval = state->neval;
+//     t->rng.skiprandom(t, t->neval);
+//   }
 
   if( ini | ZAPSTATE ) {
     t->neval = 0;
@@ -79,6 +79,7 @@ static int Integrate(This *t, real *integral, real *error, real *prob)
   }
 
   /* main iteration loop */
+  bool cancel = false;
   for( ; ; ) {
     number nsamples = state->nsamples;
     creal jacobian = 1./nsamples;
@@ -111,7 +112,9 @@ static int Integrate(This *t, real *integral, real *error, real *prob)
         *w++ = weight;
       }
 
-      DoSample(t, n, w, f, t->frame, state->niter + 1);
+     cancel =  DoSample(t, n, w, f, t->frame, state->niter + 1) == -1;
+
+     if (cancel){break;}
 
       bin = bins;
       w = t->frame;
@@ -134,11 +137,14 @@ static int Integrate(This *t, real *integral, real *error, real *prob)
         bin += t->ndim;
       }
     }
-
-    fail = 0;
+    if (cancel) { break; }
+    
+    fail = 1;
 
     /* compute the integral and error values */
 
+    int currentComp = 0;
+    double* currentAverages = malloc((t->ncomp) * sizeof(double));
     for( c = state->cumul; c < C; ++c ) {
       real w = Weight(c->sum, c->sqsum, state->nsamples);
       real sigsq = 1/(c->weightsum += w);
@@ -146,7 +152,7 @@ static int Integrate(This *t, real *integral, real *error, real *prob)
 
       c->avg = LAST ? (sigsq = 1/w, c->sum) : avg;
       c->err = sqrtx(sigsq);
-      fail |= (c->err > MaxErr(c->avg));
+      //fail |= (c->err > MaxErr(c->avg));
 
       if( state->niter == 0 ) c->guess = c->sum;
       else {
@@ -156,7 +162,13 @@ static int Integrate(This *t, real *integral, real *error, real *prob)
       c->chisq = c->chisqsum - avg*c->chisum;
 
       c->sum = c->sqsum = 0;
+
+      currentAverages[currentComp] = c->avg;
+      currentComp++;
     }
+
+    fail = t->updateFunc(currentAverages, t->ncomp, t->userdata);
+    free(currentAverages);
 
     if( VERBOSE ) {
       char *oe = out + sprintf(out, "\n"
@@ -170,7 +182,7 @@ static int Integrate(This *t, real *integral, real *error, real *prob)
       Print(out);
     }
 
-    if( fail == 0 && t->neval >= t->mineval ) break;
+    if (fail == 0 && t->neval >= t->mineval) break; 
 
     if( t->neval >= t->maxeval && !StateWriteTest(t) ) break;
 
@@ -198,22 +210,26 @@ static int Integrate(This *t, real *integral, real *error, real *prob)
     ++state->niter;
     state->nsamples += t->nincrease;
 
-    if( StateWriteTest(t) ) {
-      state->signature = StateSignature(t, 1);
-      state->neval = t->neval;
-      StateWriteOpen(t, fd) {
-        StateWrite(fd, state, statesize);
-      } StateWriteClose(t, fd);
-      if( t->neval >= t->maxeval ) break;
-    }
+//     if( StateWriteTest(t) ) {
+//       state->signature = StateSignature(t, 1);
+//       state->neval = t->neval;
+//       StateWriteOpen(t, fd) {
+//         StateWrite(fd, state, statesize);
+//       } StateWriteClose(t, fd);
+//       if( t->neval >= t->maxeval ) break;
+//     }
   }
 
-  for( comp = 0; comp < t->ncomp; ++comp ) {
-    cCumulants *c = &state->cumul[comp];
-    integral[comp] = c->avg;
-    error[comp] = c->err;
-    prob[comp] = ChiSquare(c->chisq, state->niter);
+  if (!cancel) 
+  {
+    for (comp = 0; comp < t->ncomp; ++comp) {
+      cCumulants *c = &state->cumul[comp];
+      integral[comp] = c->avg;
+      error[comp] = c->err;
+      prob[comp] = ChiSquare(c->chisq, state->niter);
+    }
   }
+  
 
 abort:
   PutGrid(t, state_grid);

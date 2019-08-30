@@ -1,9 +1,4 @@
-/*
-	cuba.h
-		Prototypes for the Cuba library
-		this file is part of Cuba
-		last modified 13 Mar 15 th
-*/
+#pragma once
 
 typedef double cubareal;
 
@@ -14,18 +9,35 @@ typedef double cubareal;
 	   In most cases, integrand_t is just what you want, otherwise
 	   simply use an explicit typecast to integrand_t in the Cuba
 	   invocation. */
-typedef int (*integrand_t)(const int *ndim, const cubareal x[],
-  const int *ncomp, cubareal f[], void *userdata);
+typedef int (*integrand_t)(const int *ndim, const double* x,
+  const int *ncomp, double* f, void *userdata,
+  const int* nvec,const int* core,const double* w,const int* iter);
+
 
 typedef void (*peakfinder_t)(const int *ndim, const cubareal b[],
   int *n, cubareal x[], void *userdata);
+
+typedef int(*CustomSampleFunc_t)(const int n,
+                                 const double* x,
+                                 double*f,
+                                 const int core,
+                                 const double* w,
+                                 const int iter,
+                                 integrand_t func,
+                                 const int* ndim,
+                                 const int* ncomp,
+                                 void* userdata);
+
+typedef int(*update_t)(const double *averages,int nComps,void *userdata);
+
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 void Vegas(const int ndim, const int ncomp,
-  integrand_t integrand, void *userdata, const int nvec,
+  integrand_t integrand, void *userdata,CustomSampleFunc_t customSample, update_t customUpdate,
+  const int nvec,
   const cubareal epsrel, const cubareal epsabs,
   const int flags, const int seed,
   const int mineval, const int maxeval,

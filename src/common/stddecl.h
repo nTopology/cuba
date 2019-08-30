@@ -8,9 +8,7 @@
 #ifndef _stddecl_h_
 #define _stddecl_h_
 
-#ifdef HAVE_CONFIG_H
 #include "config.h"
-#endif
 
 #define _BSD_SOURCE
 #define _SVID_SOURCE
@@ -37,6 +35,7 @@
 #endif
 #endif
 
+
 #ifdef HAVE_ALLOCA_H
 #include <alloca.h>
 #elif defined __GNUC__
@@ -55,7 +54,7 @@ void *alloca (size_t);
 #endif
 
 #ifndef NDIM
-#define NDIM t->ndim
+#define NDIM 3
 #define MAXDIM 1024
 #else
 #define MAXDIM NDIM
@@ -169,7 +168,8 @@ enum { uninitialized = 0x61627563 };
 #else
 #define Sized(type, var, size) type *var = alloca(size)
 #define Vector(type, var, n1) type *var = alloca((n1)*sizeof(type))
-#define Array(type, var, n1, n2) type (*var)[n2] = alloca((n1)*(n2)*sizeof(type))
+#define Array(type, var, n1, n2)  type (*var)[n2] = alloca((n1)*(n2)*sizeof(type))
+
 #endif
 
 #define FORK_ONLY(...)

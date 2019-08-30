@@ -9,18 +9,18 @@
 static inline void GetGrid(cThis *t, Grid *grid)
 {
   count bin, dim;
-  unsigned const int slot = abs(t->gridno) - 1;
-
-  if( t->gridno < 0 && slot < MAXGRIDS ) griddim_[slot] = 0;
-
-  if( slot < MAXGRIDS && gridptr_[slot] ) {
-    if( griddim_[slot] == t->ndim ) {
-      XCopy(grid, gridptr_[slot]);
-      return;
-    }
-    free(gridptr_[slot]);
-    gridptr_[slot] = NULL;
-  }
+//   unsigned const int slot = abs(t->gridno) - 1;
+// 
+//   if( t->gridno < 0 && slot < MAXGRIDS ) griddim_[slot] = 0;
+// 
+//   if( slot < MAXGRIDS && gridptr_[slot] ) {
+//     if( griddim_[slot] == t->ndim ) {
+//       XCopy(grid, gridptr_[slot]);
+//       return;
+//     }
+//     free(gridptr_[slot]);
+//     gridptr_[slot] = NULL;
+//   }
 
   for( bin = 0; bin < NBINS; ++bin )
     grid[0][bin] = (bin + 1)/(real)NBINS;
@@ -32,13 +32,13 @@ static inline void GetGrid(cThis *t, Grid *grid)
 
 static inline void PutGrid(cThis *t, Grid *grid)
 {
-  unsigned const int slot = abs(t->gridno) - 1;
-
-  if( slot < MAXGRIDS ) {
-    if( gridptr_[slot] == NULL ) Alloc(gridptr_[slot], t->ndim);
-    griddim_[slot] = t->ndim;
-    XCopy(gridptr_[slot], grid);
-  }
+//   unsigned const int slot = abs(t->gridno) - 1;
+// 
+//   if( slot < MAXGRIDS ) {
+//     if( gridptr_[slot] == NULL ) Alloc(gridptr_[slot], t->ndim);
+//     griddim_[slot] = t->ndim;
+//     XCopy(gridptr_[slot], grid);
+//   }
 }
 
 /*********************************************************************/

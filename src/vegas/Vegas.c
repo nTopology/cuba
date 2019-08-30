@@ -14,8 +14,9 @@
 
 /*********************************************************************/
 
-Extern void EXPORT(Vegas)(ccount ndim, ccount ncomp,
-  Integrand integrand, void *userdata, cnumber nvec,
+Extern __declspec(dllexport) void(Vegas)
+ (ccount ndim, ccount ncomp,
+  Integrand integrand, void *userdata, CustomSampleFunc customSample,UpdateFunc uf, cnumber nvec,
   creal epsrel, creal epsabs, cint flags, cint seed,
   cnumber mineval, cnumber maxeval,
   cnumber nstart, cnumber nincrease,
@@ -28,6 +29,8 @@ Extern void EXPORT(Vegas)(ccount ndim, ccount ncomp,
 
   VerboseInit();
 
+  t.sampleFunc = customSample;
+  t.updateFunc = uf;
   t.ndim = ndim;
   t.ncomp = ncomp;
   t.integrand = integrand;
@@ -54,41 +57,41 @@ Extern void EXPORT(Vegas)(ccount ndim, ccount ncomp,
 
 /*********************************************************************/
 
-Extern void EXPORT(vegas)(ccount *pndim, ccount *pncomp,
-  Integrand integrand, void *userdata, cnumber *pnvec,
-  creal *pepsrel, creal *pepsabs, cint *pflags, cint *pseed,
-  cnumber *pmineval, cnumber *pmaxeval,
-  cnumber *pnstart, cnumber *pnincrease, 
-  cnumber *pnbatch, cint *pgridno,
-  cchar *statefile, Spin **pspin,
-  number *pneval, int *pfail,
-  real *integral, real *error, real *prob, cint statefilelen)
-{
-  This t;
-
-  VerboseInit();
-
-  t.ndim = *pndim;
-  t.ncomp = *pncomp;
-  t.integrand = integrand;
-  t.userdata = userdata;
-  t.nvec = *pnvec;
-  t.epsrel = *pepsrel;
-  t.epsabs = *pepsabs;
-  t.flags = MaxVerbose(*pflags);
-  t.seed = *pseed;
-  t.mineval = *pmineval;
-  t.maxeval = *pmaxeval;
-  t.nstart = *pnstart;
-  t.nincrease = *pnincrease;
-  t.nbatch = *pnbatch;
-  t.gridno = *pgridno;
-  CString(t.statefile, statefile, statefilelen);
-  FORK_ONLY(t.spin = Invalid(pspin) ? NULL : *pspin;)
-
-  *pfail = Integrate(&t, integral, error, prob);
-  *pneval = t.neval;
-
-  WaitCores(&t, pspin);
-}
+// Extern void EXPORT(vegas)(ccount *pndim, ccount *pncomp,
+//   Integrand integrand, void *userdata, cnumber *pnvec,
+//   creal *pepsrel, creal *pepsabs, cint *pflags, cint *pseed,
+//   cnumber *pmineval, cnumber *pmaxeval,
+//   cnumber *pnstart, cnumber *pnincrease, 
+//   cnumber *pnbatch, cint *pgridno,
+//   cchar *statefile, Spin **pspin,
+//   number *pneval, int *pfail,
+//   real *integral, real *error, real *prob, cint statefilelen)
+// {
+//   This t;
+// 
+//   VerboseInit();
+// 
+//   t.ndim = *pndim;
+//   t.ncomp = *pncomp;
+//   t.integrand = integrand;
+//   t.userdata = userdata;
+//   t.nvec = *pnvec;
+//   t.epsrel = *pepsrel;
+//   t.epsabs = *pepsabs;
+//   t.flags = MaxVerbose(*pflags);
+//   t.seed = *pseed;
+//   t.mineval = *pmineval;
+//   t.maxeval = *pmaxeval;
+//   t.nstart = *pnstart;
+//   t.nincrease = *pnincrease;
+//   t.nbatch = *pnbatch;
+//   t.gridno = *pgridno;
+//   CString(t.statefile, statefile, statefilelen);
+//   FORK_ONLY(t.spin = Invalid(pspin) ? NULL : *pspin;)
+// 
+//   *pfail = Integrate(&t, integral, error, prob);
+//   *pneval = t.neval;
+// 
+//   WaitCores(&t, pspin);
+// }
 

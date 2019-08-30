@@ -31,6 +31,21 @@ typedef const Cumulants cCumulants;
 typedef int (*Integrand)(ccount *, creal *, ccount *, real *,
   void *, cnumber *, cint *, creal *, cint *);
 
+typedef int(*CustomSampleFunc)(cnumber n, 
+                               creal *x, 
+                               real *f, 
+                               cint core, 
+                               creal *w, 
+                               ccount iter,
+                               Integrand func,
+                               const int* ndim,
+                               const int* ncomp,
+                               void* userdata);
+
+
+typedef int(*UpdateFunc)(const double *averages, int nComps, void *userdata);
+
+
 typedef struct _this {
   count ndim, ncomp;
 #ifndef MLVERSION
@@ -52,12 +67,15 @@ typedef struct _this {
   number neval;
   RNGState rng;
   jmp_buf abort;
+  CustomSampleFunc sampleFunc;
+  UpdateFunc updateFunc;
 } This;
 
 #define nframe nbatch
 
 typedef const This cThis;
 
-static Grid *gridptr_[MAXGRIDS];
-static count griddim_[MAXGRIDS];
+
+//static Grid *gridptr_[MAXGRIDS];
+//static count griddim_[MAXGRIDS];
 
