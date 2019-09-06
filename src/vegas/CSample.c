@@ -15,17 +15,6 @@ extern corespec cubaworkers_;
 static inline number SampleRaw(This *t, number n, creal *x, real *f,
   cint core VES_ONLY(, creal *w, ccount iter))
 {
-//   number nvec; for (nvec = t->nvec; n > 0; n -= nvec) {
-//     nvec = IMin(n, nvec);
-//     if (t->integrand(&t->ndim, x, &t->ncomp, f, t->userdata, &nvec, &core
-//                      VES_ONLY(, w, &iter)
-//                      DIV_ONLY(, &t->phase)) == ABORT) return -1;
-//     VES_ONLY(w += nvec;)
-//       x += nvec * t->ndim;
-//     f += nvec * t->ncomp;
-//   }
-//   return 0;
-
   return t->sampleFunc(n, x, f, core, w, iter, t->integrand, &t->ndim, &t->ncomp, t->userdata);
  
 }
