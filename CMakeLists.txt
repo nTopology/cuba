@@ -1,8 +1,7 @@
 #cuba
 
 add_library(cuba SHARED 
-    src/vegas/Vegas.c
-    src/common/Data.c)
+    src/vegas/Vegas.c)
 
 add_library(cuba::cuba ALIAS cuba)
 

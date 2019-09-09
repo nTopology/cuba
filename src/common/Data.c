@@ -8,7 +8,7 @@
 
 #include "stddecl.h"
 
-int cubaverb_ = uninitialized;
+//int cubaverb_ = uninitialized;
 
 #ifdef HAVE_FORK
 corespec cubaworkers_ = {
