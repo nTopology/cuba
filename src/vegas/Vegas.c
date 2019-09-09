@@ -25,9 +25,7 @@ Extern __declspec(dllexport) void(Vegas)(ccount ndim, ccount ncomp,
   real *integral, real *error, real *prob)
 {
   This t;
-
-  VerboseInit();
-
+  
   t.sampleFunc = customSample;
   t.updateFunc = uf;
   t.ndim = ndim;
@@ -37,7 +35,7 @@ Extern __declspec(dllexport) void(Vegas)(ccount ndim, ccount ncomp,
   t.nvec = nvec;
   t.epsrel = epsrel;
   t.epsabs = epsabs;
-  t.flags = MaxVerbose(flags);
+  t.flags = flags;
   t.seed = seed;
   t.mineval = mineval;
   t.maxeval = maxeval;
@@ -46,11 +44,9 @@ Extern __declspec(dllexport) void(Vegas)(ccount ndim, ccount ncomp,
   t.nbatch = nbatch;
   t.gridno = gridno;
   t.statefile = statefile;
-  FORK_ONLY(t.spin = Invalid(pspin) ? NULL : *pspin;)
 
   *pfail = Integrate(&t, integral, error, prob);
   *pneval = t.neval;
 
-  WaitCores(&t, pspin);
 }
 
