@@ -14,7 +14,7 @@
 
 /*********************************************************************/
 
-Extern void EXPORT(Vegas)(ccount ndim, ccount ncomp,
+Extern __declspec(dllexport) void(Vegas)(ccount ndim, ccount ncomp,
   Integrand integrand, void *userdata, CustomSampleFunc customSample,UpdateFunc uf, cnumber nvec,
   creal epsrel, creal epsabs, cint flags, cint seed,
   cnumber mineval, cnumber maxeval,
