@@ -28,26 +28,6 @@ static int Integrate(This *t, real *integral, real *error, real *prob)
   Array(Grid, margsum, NCOMP, NDIM);
   Vector(char, out, 128*NCOMP + 256);
 
-  if( VERBOSE > 1 ) {
-    sprintf(out, "Vegas input parameters:\n"
-      "  ndim " COUNT "\n  ncomp " COUNT "\n"
-      ML_NOT("  nvec " NUMBER "\n")
-      "  epsrel " REAL "\n  epsabs " REAL "\n"
-      "  flags %d\n  seed %d\n"
-      "  mineval " NUMBER "\n  maxeval " NUMBER "\n"
-      "  nstart " NUMBER "\n  nincrease " NUMBER "\n"
-      "  nbatch " NUMBER "\n  gridno %d\n"
-      "  statefile \"%s\"",
-      t->ndim, t->ncomp,
-      ML_NOT(t->nvec,)
-      SHOW(t->epsrel), SHOW(t->epsabs),
-      t->flags, t->seed,
-      t->mineval, t->maxeval,
-      t->nstart, t->nincrease, t->nbatch,
-      t->gridno, t->statefile);
-    Print(out);
-  }
-
   if( BadComponent(t) ) return -2;
   if( BadDimension(t) ) return -1;
 
@@ -170,18 +150,6 @@ static int Integrate(This *t, real *integral, real *error, real *prob)
 
     fail = t->updateFunc(currentAverages, t->ncomp, t->userdata);
     free(currentAverages);
-
-    if( VERBOSE ) {
-      char *oe = out + sprintf(out, "\n"
-        "Iteration " COUNT ":  " NUMBER " integrand evaluations so far",
-        state->niter + 1, t->neval);
-      for( c = state->cumul, comp = 0; c < C; ++c )
-        oe += sprintf(oe, "\n[" COUNT "] "
-          REAL " +- " REAL "  \tchisq " REAL " (" COUNT " df)",
-          ++comp, SHOW(c->avg), SHOW(c->err),
-          SHOW(c->chisq), state->niter);
-      Print(out);
-    }
 
     if (fail == 0 && t->neval >= t->mineval) break; 
 

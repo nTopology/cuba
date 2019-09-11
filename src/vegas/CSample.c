@@ -7,10 +7,6 @@
 */
 
 
-static coreinit cubafun_;
-extern int cubaverb_;
-extern corespec cubaworkers_;
-
 
 static inline number SampleRaw(This *t, number n, creal *x, real *f,
   cint core VES_ONLY(, creal *w, ccount iter))
@@ -24,7 +20,6 @@ static inline number SampleRaw(This *t, number n, creal *x, real *f,
 static inline int DoSampleSerial(This *t, cnumber n, creal *x, real *f
   VES_ONLY(, creal *w, ccount iter))
 {
-  MasterInit();
   t->neval += n;
   return SampleRaw(t, n, x, f, 0 VES_ONLY(, w, iter));
 }
@@ -42,13 +37,6 @@ DIV_ONLY(static int Explore(This *t, cint iregion);)
 #define DoSample DoSampleSerial
 #define Explore ExploreSerial
 #define ForkCores(t)
-
-static inline void WaitCores(This *t, Spin **pspin)
-{
-  if( Invalid(pspin) ) MasterExit();
-}
-
-#define WaitCores(t, pspin)
 
 #endif
 
