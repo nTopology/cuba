@@ -12,9 +12,11 @@
 #include "decl.h"
 #include "CSample.c"
 
+#include <cuba_export.h>
+
 /*********************************************************************/
 
-Extern __declspec(dllexport) void(Vegas)(ccount ndim, ccount ncomp,
+Extern CUBA_EXPORT void(Vegas)(ccount ndim, ccount ncomp,
   Integrand integrand, void *userdata, CustomSampleFunc customSample,UpdateFunc uf, cnumber nvec,
   creal epsrel, creal epsabs, cint flags, cint seed,
   cnumber mineval, cnumber maxeval,
