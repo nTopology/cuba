@@ -46,8 +46,12 @@ Extern CUBA_EXPORT void(Vegas)(ccount ndim, ccount ncomp,
   t.nbatch = nbatch;
   t.gridno = gridno;
   t.statefile = statefile;
-
-  *pfail = Integrate(&t, integral, error, prob);
+  if (ndim == 1) {
+    *pfail = Integrate1D(&t, integral, error, prob);
+  }
+  else {
+    *pfail = Integrate3D(&t, integral, error, prob);
+  }
   *pneval = t.neval;
 
 }
