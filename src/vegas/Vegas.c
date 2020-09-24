@@ -27,7 +27,7 @@ Extern CUBA_EXPORT void(Vegas)(ccount ndim, ccount ncomp,
   real *integral, real *error, real *prob)
 {
   This t;
-  
+  t.nSkips = 0;
   t.sampleFunc = customSample;
   t.updateFunc = uf;
   t.ndim = ndim;
@@ -47,10 +47,20 @@ Extern CUBA_EXPORT void(Vegas)(ccount ndim, ccount ncomp,
   t.gridno = gridno;
   t.statefile = statefile;
   if (ndim == 1) {
+    t.maxSkips = 3;
     *pfail = Integrate1D(&t, integral, error, prob);
+    while (*pfail == -7) {
+      t.nstart *= 2;
+      *pfail = Integrate1D(&t, integral, error, prob);
+    }
   }
   else {
-    *pfail = Integrate3D(&t, integral, error, prob);
+    t.maxSkips = 2;
+    *pfail     = Integrate3D(&t, integral, error, prob);
+    while (*pfail == -7) {
+      t.nstart *= 4;
+      *pfail = Integrate3D(&t, integral, error, prob);
+    }
   }
   *pneval = t.neval;
 

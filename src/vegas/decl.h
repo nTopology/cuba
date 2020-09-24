@@ -69,6 +69,8 @@ typedef struct _this {
   jmp_buf abort;
   CustomSampleFunc sampleFunc;
   UpdateFunc updateFunc;
+  int nSkips;
+  int maxSkips;
 } This;
 
 #define nframe nbatch

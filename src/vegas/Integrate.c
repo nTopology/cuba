@@ -18,6 +18,7 @@ static int Integrate3D(This *t, real *integral, real *error, real *prob)
   bin_t *bins;
   count dim, comp;
   int fail;
+  bool varianceFail = false;
 
   StateDecl;
   csize_t statesize = sizeof(State) +
@@ -120,6 +121,21 @@ static int Integrate3D(This *t, real *integral, real *error, real *prob)
     
     fail = 1;
 
+    if (t->nSkips < t->maxSkips) {
+      Cumulants* c0 = state->cumul;
+      double     aa = sqrtx(c0->sqsum * state->nsamples);
+      double     bb = (aa + c0->sum) * (aa - c0->sum);
+      if (bb <= NOTZERO) {
+        varianceFail = true;
+        t->nSkips += 1;
+        fail = -7;
+        break;
+      }
+      else {
+        t->nSkips = t->maxSkips;
+      }
+    }
+
     /* compute the integral and error values */
 
     for( c = state->cumul; c < C; ++c ) {
@@ -207,7 +223,7 @@ static int Integrate1D(This *t, real *integral, real *error, real *prob)
   bin_t *bins;
   count dim, comp;
   int fail;
-
+  bool varianceFail = false;
   StateDecl;
   csize_t statesize = sizeof(State) +
     NCOMP * sizeof(Cumulants) + 1 * sizeof(Grid);
@@ -309,6 +325,20 @@ static int Integrate1D(This *t, real *integral, real *error, real *prob)
 
     fail = 1;
 
+    if (t->nSkips < t->maxSkips) {
+      Cumulants* c0 = state->cumul;
+      double     aa = sqrtx(c0->sqsum * state->nsamples);
+      double     bb = (aa + c0->sum) * (aa - c0->sum);
+      if (bb <= NOTZERO) {
+        varianceFail = true;
+        t->nSkips += 1;
+        fail = -7;
+        break;
+      }
+      else {
+        t->nSkips = t->maxSkips;
+      }
+    }
     /* compute the integral and error values */
 
     for (c = state->cumul; c < C; ++c) {
@@ -338,6 +368,7 @@ static int Integrate1D(This *t, real *integral, real *error, real *prob)
     }
 
     fail = t->updateFunc(currentAverages, t->ncomp, t->userdata);
+
     free(currentAverages);
 
     if (fail == 0 && t->neval >= t->mineval) break;
