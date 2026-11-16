@@ -43,7 +43,7 @@ typedef int(*CustomSampleFunc)(cnumber n,
                                void* userdata);
 
 
-typedef int(*UpdateFunc)(const double *averages, int nComps, void *userdata);
+typedef int(*UpdateFunc)(const double *averages, const double *errors, int nComps, void *userdata);
 
 
 typedef struct _this {

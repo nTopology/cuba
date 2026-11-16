@@ -28,7 +28,8 @@ typedef int(*CustomSampleFunc_t)(const int n,
                                  const int* ncomp,
                                  void* userdata);
 
-typedef int(*update_t)(const double *averages,int nComps,void *userdata);
+/* errors[i] is Vegas' standard error estimate for averages[i] */
+typedef int(*update_t)(const double *averages,const double *errors,int nComps,void *userdata);
 
 
 #ifdef __cplusplus

@@ -157,14 +157,16 @@ static int Integrate3D(This *t, real *integral, real *error, real *prob)
       c->sum = c->sqsum = 0;
     }
 
-    double* currentAverages = malloc((t->ncomp) * sizeof(double));
+    double* currentAverages = malloc(2 * (t->ncomp) * sizeof(double));
+    double* currentErrors   = currentAverages + t->ncomp;
 
     for (int currentComp = 0; currentComp < t->ncomp; ++currentComp) {
       cCumulants *cc = &state->cumul[currentComp];
       currentAverages[currentComp] = cc->avg;
+      currentErrors[currentComp]   = cc->err;
     }
 
-    fail = t->updateFunc(currentAverages, t->ncomp, t->userdata);
+    fail = t->updateFunc(currentAverages, currentErrors, t->ncomp, t->userdata);
     free(currentAverages);
 
     if (fail == 0 && t->neval >= t->mineval) break; 
@@ -360,14 +362,16 @@ static int Integrate1D(This *t, real *integral, real *error, real *prob)
       c->sum = c->sqsum = 0;
     }
 
-    double* currentAverages = malloc((t->ncomp) * sizeof(double));
+    double* currentAverages = malloc(2 * (t->ncomp) * sizeof(double));
+    double* currentErrors   = currentAverages + t->ncomp;
 
     for (int currentComp = 0; currentComp < t->ncomp; ++currentComp) {
       cCumulants *cc = &state->cumul[currentComp];
       currentAverages[currentComp] = cc->avg;
+      currentErrors[currentComp]   = cc->err;
     }
 
-    fail = t->updateFunc(currentAverages, t->ncomp, t->userdata);
+    fail = t->updateFunc(currentAverages, currentErrors, t->ncomp, t->userdata);
 
     free(currentAverages);
 
